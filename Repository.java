@@ -40,4 +40,45 @@ public class Repository<T> {
     public List<T> getAll() {
         return new ArrayList<>(items);
     }
+
+    // Основной метод для тестирования репозитория
+    public static void main(String[] args) {
+        Repository<String> repository = new Repository<>();
+
+        // Добавление элементов
+        repository.add("Item 1");
+        repository.add("Item 2");
+        repository.add("Item 3");
+
+        // Вывод всех элементов
+        System.out.println("All items:");
+        repository.getAll().forEach(System.out::println);
+
+        // Поиск элемента по индексу
+        Optional<String> item = repository.get(1);
+        item.ifPresentOrElse(
+            value -> System.out.println("Found item at index 1: " + value),
+            () -> System.out.println("Item not found at index 1")
+        );
+
+        // Обновление элемента
+        boolean updated = repository.update(1, "Updated Item 2");
+        if (updated) {
+            System.out.println("Item at index 1 updated.");
+        } else {
+            System.out.println("Failed to update item at index 1.");
+        }
+
+        // Удаление элемента
+        boolean removed = repository.remove("Item 1");
+        if (removed) {
+            System.out.println("Item 'Item 1' removed.");
+        } else {
+            System.out.println("Failed to remove 'Item 1'.");
+        }
+
+        // Вывод всех элементов после обновлений
+        System.out.println("All items after updates:");
+        repository.getAll().forEach(System.out::println);
+    }
 }
