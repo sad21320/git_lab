@@ -1,23 +1,93 @@
-import java.util.Arrays; // Импорт для работы с Arrays
-import java.util.Scanner; // Импорт для работы с Scanner
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
 
-public class БинарныйПоиск1 {
-    public static int двоичныйПоиск(int[] массив, int искомый) {
-        return двоичныйПоиск(массив, искомый, 0, массив.length - 1);
-    }
+public class BinarySearchGUI {
 
-    private static int двоичныйПоиск(int[] массив, int искомый, int низ, int верх) {
-        while (низ <= верх) {
-            int середина = низ + (верх - низ) / 2;
-            if (массив[середина] < искомый) {
-                низ = середина + 1;
-            } else if (массив[середина] > искомый) {
-                верх = середина - 1;
-            } else {
-                return середина;
+    private static int[] массив;
+
+    public static void main(String[] args) {
+        // Создание основного окна
+        JFrame frame = new JFrame("Бинарный поиск и сортировка");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 400);
+
+        // Панель для элементов
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(6, 1));
+
+        // Поля для ввода массива
+        JLabel labelArray = new JLabel("Введите элементы массива через запятую:");
+        JTextField fieldArray = new JTextField();
+
+        // Поля для ввода искомого элемента
+        JLabel labelTarget = new JLabel("Введите искомый элемент:");
+        JTextField fieldTarget = new JTextField();
+
+        // Кнопка для сортировки массива
+        JButton buttonSort = new JButton("Сортировать массив");
+
+        // Кнопка для выполнения двоичного поиска
+        JButton buttonSearch = new JButton("Выполнить поиск");
+
+        // Поле для отображения результата
+        JTextArea resultArea = new JTextArea();
+        resultArea.setEditable(false);
+
+        // Добавление элементов на панель
+        panel.add(labelArray);
+        panel.add(fieldArray);
+        panel.add(labelTarget);
+        panel.add(fieldTarget);
+        panel.add(buttonSort);
+        panel.add(buttonSearch);
+
+        // Добавление панели и области результата в окно
+        frame.add(panel, BorderLayout.NORTH);
+        frame.add(new JScrollPane(resultArea), BorderLayout.CENTER);
+
+        // Действие для кнопки сортировки
+        buttonSort.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String input = fieldArray.getText().trim();
+                    String[] elements = input.split(",");
+                    массив = Arrays.stream(elements).mapToInt(Integer::parseInt).toArray();
+                    пузырьковаяСортировка(массив);
+                    resultArea.setText("Отсортированный массив: " + Arrays.toString(массив));
+                } catch (Exception ex) {
+                    resultArea.setText("Ошибка: Проверьте корректность ввода массива.");
+                }
             }
-        }
-        return -1;
+        });
+
+        // Действие для кнопки поиска
+        buttonSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (массив == null || массив.length == 0) {
+                        resultArea.setText("Сначала введите и отсортируйте массив.");
+                        return;
+                    }
+                    int target = Integer.parseInt(fieldTarget.getText().trim());
+                    int result = двоичныйПоиск(массив, target);
+                    if (result == -1) {
+                        resultArea.setText(resultArea.getText() + "\nЭлемент " + target + " не найден.");
+                    } else {
+                        resultArea.setText(resultArea.getText() + "\nЭлемент " + target + " найден на индексе " + result + ".");
+                    }
+                } catch (Exception ex) {
+                    resultArea.setText("Ошибка: Проверьте корректность ввода искомого элемента.");
+                }
+            }
+        });
+
+        // Отображение окна
+        frame.setVisible(true);
     }
 
     private static void пузырьковаяСортировка(int[] массив) {
@@ -33,90 +103,19 @@ public class БинарныйПоиск1 {
         }
     }
 
-
-
-public static void тест() {
-    System.out.println("Начало тестов...");
-
-    // Тест 1: Проверка сортировки и поиска в массиве из положительных чисел
-    int[] массив1 = {5, 3, 8, 1, 9};
-    пузырьковаяСортировка(массив1); // Сортируем массив
-    System.out.println("Тест 1 - Ожидается [1, 3, 5, 8, 9]: " + Arrays.toString(массив1));
-    // Проверяем поиск элемента, который присутствует
-    System.out.println("Индекс 8: " + двоичныйПоиск(массив1, 8)); // Ожидается индекс 3
-    // Проверяем поиск элемента, которого нет
-    System.out.println("Индекс 2 (не найдено): " + двоичныйПоиск(массив1, 2)); // Ожидается -1
-
-    // Тест 2: Проверка с массивом, содержащим отрицательные числа
-    int[] массив2 = {-10, -5, -3, -1, 0};
-    пузырьковаяСортировка(массив2); // Сортируем массив (на случай, если изначально неотсортирован)
-    System.out.println("Тест 2 - Ожидается [-10, -5, -3, -1, 0]: " + Arrays.toString(массив2));
-    // Проверяем поиск отрицательного числа
-    System.out.println("Индекс -3: " + двоичныйПоиск(массив2, -3)); // Ожидается индекс 2
-    // Проверяем поиск числа, которого нет в массиве
-    System.out.println("Индекс 1 (не найдено): " + двоичныйПоиск(массив2, 1)); // Ожидается -1
-
-    // Тест 3: Проверка с массивом, содержащим дублирующиеся числа
-    int[] массив3 = {2, 4, 4, 4, 6, 6};
-    пузырьковаяСортировка(массив3); // Сортируем массив
-    System.out.println("Тест 3 - Ожидается [2, 4, 4, 4, 6, 6]: " + Arrays.toString(массив3));
-    // Проверяем поиск числа, которое встречается несколько раз
-    System.out.println("Индекс 4: " + двоичныйПоиск(массив3, 4)); // Может вернуть индекс 1, 2 или 3
-    // Проверяем поиск числа, которого нет
-    System.out.println("Индекс 7 (не найдено): " + двоичныйПоиск(массив3, 7)); // Ожидается -1
-
-    // Тест 4: Проверка с массивом из одного элемента
-    int[] массив4 = {42};
-    пузырьковаяСортировка(массив4); // Сортируем массив (хотя он уже отсортирован)
-    System.out.println("Тест 4 - Ожидается [42]: " + Arrays.toString(массив4));
-    // Проверяем поиск элемента, который есть
-    System.out.println("Индекс 42: " + двоичныйПоиск(массив4, 42)); // Ожидается индекс 0
-    // Проверяем поиск элемента, которого нет
-    System.out.println("Индекс 7 (не найдено): " + двоичныйПоиск(массив4, 7)); // Ожидается -1
-
-    // Тест 5: Проверка с пустым массивом
-    int[] массив5 = {};
-    пузырьковаяСортировка(массив5); // Попытка сортировки (ничего не произойдёт)
-    System.out.println("Тест 5 - Ожидается []: " + Arrays.toString(массив5));
-    // Проверяем поиск числа в пустом массиве
-    System.out.println("Индекс 5 (не найдено): " + двоичныйПоиск(массив5, 5)); // Ожидается -1
-
-    System.out.println("Тесты завершены.");
-}
-
-
-
-    public static void main(String[] args) {
-        // Тестирование
-        тест();
-
-        // Основная программа
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.print("Введите размерность массива: ");
-        int размер = scanner.nextInt();
-        int[] массив = new int[размер];
-
-        System.out.println("Введите элементы массива:");
-        for (int i = 0; i < размер; i++) {
-            массив[i] = scanner.nextInt();
+    private static int двоичныйПоиск(int[] массив, int искомый) {
+        int низ = 0;
+        int верх = массив.length - 1;
+        while (низ <= верх) {
+            int середина = низ + (верх - низ) / 2;
+            if (массив[середина] < искомый) {
+                низ = середина + 1;
+            } else if (массив[середина] > искомый) {
+                верх = середина - 1;
+            } else {
+                return середина;
+            }
         }
-
-        пузырьковаяСортировка(массив);
-
-        System.out.println("Отсортированный массив:");
-        for (int i = 0; i < размер; i++) {
-            System.out.println("Элемент массив[" + i + "]: " + массив[i]);
-        }
-
-        System.out.print("Введите искомый элемент: ");
-        int искомый = scanner.nextInt();
-
-        int результат = двоичныйПоиск(массив, искомый);
-        if (результат == -1) {
-            System.out.println("Элемент не найден");
-        } else {
-            System.out.println("Искомый элемент имеет индекс " + результат);
-        }
+        return -1;
     }
 }
